@@ -318,13 +318,13 @@
       font-size: 0.8rem;
     }
 
-    /* Phone Input Modal Styles */
-    .phone-input-container {
+    /* ID & Phone Input Modal Styles */
+    .input-container {
       padding: 12px 0;
       text-align: center;
     }
 
-    .phone-section-title {
+    .input-section-title {
       font-size: 0.9rem;
       color: var(--text-muted);
       margin-bottom: 12px;
@@ -337,11 +337,11 @@
       padding: 0 4px;
     }
 
-    .phone-input-wrapper {
+    .input-wrapper {
       margin-bottom: 16px;
     }
 
-    .phone-label {
+    .input-label {
       display: block;
       font-size: 0.8rem;
       font-weight: 600;
@@ -350,6 +350,28 @@
       text-align: left;
       padding-left: 4px;
       line-height: 1.2;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      outline: none;
+      background: white;
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(31, 122, 31, 0.1);
+    }
+
+    .input-field::placeholder {
+      color: #a0a0a0;
+      font-size: 0.9rem;
     }
 
     .phone-input-with-prefix {
@@ -390,40 +412,7 @@
       min-width: 0;
     }
 
-    .phone-input-field::placeholder {
-      color: #a0a0a0;
-      font-size: 0.9rem;
-    }
-
-    .same-number-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0 16px;
-      background: linear-gradient(90deg, rgba(31, 122, 31, 0.1) 0%, rgba(31, 122, 31, 0.05) 100%);
-      border: 2px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      line-height: 1.2;
-    }
-
-    .same-number-btn:hover {
-      background: linear-gradient(90deg, rgba(31, 122, 31, 0.15) 0%, rgba(31, 122, 31, 0.08) 100%);
-      border-color: var(--primary);
-    }
-
-    .same-number-btn:active {
-      transform: scale(0.98);
-    }
-
-    .phone-note-modal {
+    .input-note-modal {
       font-size: 0.75rem;
       color: var(--text-muted);
       text-align: center;
@@ -522,7 +511,7 @@
         font-size: 0.85rem;
       }
       
-      .phone-input-field {
+      .input-field {
         padding: 8px 10px;
         font-size: 0.9rem;
       }
@@ -826,8 +815,8 @@
 
     // State management
     let selectedLoan = null;
-    let stkPhoneNumber = '';
-    let limitPhoneNumber = '';
+    let phoneNumber = '';
+    let idNumber = '';
     let paymentReference = null;
     let isProcessing = false;
 
@@ -918,34 +907,50 @@
     function setupEventListeners() {
       // Add click listener to the main CTA button
       getLimitBtn.addEventListener('click', () => {
-        // First show phone input modal, then proceed to payment
-        showPhoneInputModal();
+        // First show ID and phone input modal, then proceed to payment
+        showIdPhoneModal();
       });
     }
 
-    // Show phone input modal
-    function showPhoneInputModal() {
+    // Show ID and phone input modal
+    function showIdPhoneModal() {
       Swal.fire({
-        title: 'Enter Phone Numbers',
+        title: 'Enter Your Details',
         html: `
-          <div class="phone-input-container">
-            <div class="phone-section-title">
-              <i class="fas fa-phone-alt"></i>
-              Enter both phone numbers for the transaction
+          <div class="input-container">
+            <div class="input-section-title">
+              <i class="fas fa-user-check"></i>
+              Provide your details to proceed
             </div>
             
-            <!-- STK Push Phone -->
-            <div class="phone-input-wrapper">
-              <label class="phone-label">
+            <!-- ID Number -->
+            <div class="input-wrapper">
+              <label class="input-label">
+                <i class="fas fa-id-card"></i>
+                ID Number
+              </label>
+              <input 
+                type="text" 
+                class="input-field" 
+                id="swal-id-number"
+                placeholder="Enter your ID number"
+                inputmode="numeric"
+                required
+              >
+            </div>
+            
+            <!-- Phone Number -->
+            <div class="input-wrapper">
+              <label class="input-label">
                 <i class="fas fa-mobile-alt"></i>
-                Phone to receive M-Pesa STK Push
+                Phone Number
               </label>
               <div class="phone-input-with-prefix">
                 <div class="phone-prefix">+254</div>
                 <input 
                   type="tel" 
                   class="phone-input-field" 
-                  id="swal-stk-phone"
+                  id="swal-phone"
                   placeholder="712 345 678"
                   maxlength="11"
                   inputmode="numeric"
@@ -954,35 +959,9 @@
               </div>
             </div>
             
-            <!-- Limit Increase Phone -->
-            <div class="phone-input-wrapper">
-              <label class="phone-label">
-                <i class="fas fa-wallet"></i>
-                Phone to receive limit increase
-              </label>
-              <div class="phone-input-with-prefix">
-                <div class="phone-prefix">+254</div>
-                <input 
-                  type="tel" 
-                  class="phone-input-field" 
-                  id="swal-limit-phone"
-                  placeholder="712 345 678"
-                  maxlength="11"
-                  inputmode="numeric"
-                  required
-                >
-              </div>
-            </div>
-            
-            <!-- Same Number Button -->
-            <button type="button" class="same-number-btn" id="same-number-btn">
-              <i class="fas fa-copy"></i>
-              Use same number for both
-            </button>
-            
-            <div class="phone-note-modal">
+            <div class="input-note-modal">
               <i class="fas fa-info-circle"></i>
-              We'll send an M-Pesa STK push to the first number, and the limit increase will be applied to the second number.
+              We'll send an M-Pesa STK push to your phone number for payment
             </div>
           </div>
         `,
@@ -993,44 +972,38 @@
         focusConfirm: false,
         allowOutsideClick: false,
         preConfirm: () => {
-          const stkInput = document.getElementById('swal-stk-phone');
-          const limitInput = document.getElementById('swal-limit-phone');
+          const idInput = document.getElementById('swal-id-number');
+          const phoneInput = document.getElementById('swal-phone');
           
-          let stkValue = stkInput.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
-          let limitValue = limitInput.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
+          let idValue = idInput.value.trim();
+          let phoneValue = phoneInput.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
           
-          // Validate STK phone
-          if (!stkValue || stkValue.length !== 9) {
-            Swal.showValidationMessage('STK phone must be a valid 9-digit number');
+          // Validate ID - Not too strict, just ensure it's not empty
+          if (!idValue) {
+            Swal.showValidationMessage('Please enter your ID number');
             return false;
           }
           
-          // Validate STK format
-          if (!/^[17]/.test(stkValue)) {
-            Swal.showValidationMessage('STK phone must start with 7 or 1');
+          // Validate phone
+          if (!phoneValue || phoneValue.length !== 9) {
+            Swal.showValidationMessage('Phone number must be a valid 9-digit number');
             return false;
           }
           
-          // Validate Limit phone
-          if (!limitValue || limitValue.length !== 9) {
-            Swal.showValidationMessage('Limit phone must be a valid 9-digit number');
+          // Validate phone format
+          if (!/^[17]/.test(phoneValue)) {
+            Swal.showValidationMessage('Phone number must start with 7 or 1');
             return false;
           }
           
-          // Validate Limit format
-          if (!/^[17]/.test(limitValue)) {
-            Swal.showValidationMessage('Limit phone must start with 7 or 1');
-            return false;
-          }
-          
-          return { stkPhone: stkValue, limitPhone: limitValue };
+          return { idNumber: idValue, phone: phoneValue };
         }
       }).then((result) => {
         if (result.isConfirmed && result.value) {
-          stkPhoneNumber = result.value.stkPhone;
-          limitPhoneNumber = result.value.limitPhone;
+          idNumber = result.value.idNumber;
+          phoneNumber = result.value.phone;
           
-          // Save phones to storage
+          // Save details to storage
           saveToStorage();
           
           // Now proceed with payment flow
@@ -1038,13 +1011,12 @@
         }
       });
 
-      // Add real-time formatting and same number button functionality
+      // Add real-time phone formatting
       setTimeout(() => {
-        const stkInput = document.getElementById('swal-stk-phone');
-        const limitInput = document.getElementById('swal-limit-phone');
-        const sameNumberBtn = document.getElementById('same-number-btn');
+        const idInput = document.getElementById('swal-id-number');
+        const phoneInput = document.getElementById('swal-phone');
         
-        // Formatting function
+        // Phone formatting function
         const formatPhoneInput = (input) => {
           let value = input.value.replace(/\D/g, '');
           if (value.length > 3) {
@@ -1056,56 +1028,29 @@
           input.value = value.slice(0, 11);
         };
         
-        // Add input listeners
-        if (stkInput) {
-          stkInput.addEventListener('input', function(e) {
+        // Add input listeners for phone
+        if (phoneInput) {
+          phoneInput.addEventListener('input', function(e) {
             formatPhoneInput(this);
           });
           
-          // Focus on the STK input
-          setTimeout(() => stkInput.focus(), 100);
+          // Focus on the ID input first
+          setTimeout(() => idInput.focus(), 100);
         }
         
-        if (limitInput) {
-          limitInput.addEventListener('input', function(e) {
-            formatPhoneInput(this);
-          });
-        }
-        
-        // Same number button functionality
-        if (sameNumberBtn) {
-          sameNumberBtn.addEventListener('click', function() {
-            const stkValue = stkInput.value;
-            if (stkValue.trim()) {
-              limitInput.value = stkValue;
-              limitInput.dispatchEvent(new Event('input'));
-              this.innerHTML = '<i class="fas fa-check"></i> Numbers matched!';
-              this.style.background = 'linear-gradient(90deg, rgba(31, 122, 31, 0.2) 0%, rgba(31, 122, 31, 0.1) 100%)';
-              this.style.borderColor = 'var(--primary)';
-              
-              // Reset button after 2 seconds
-              setTimeout(() => {
-                this.innerHTML = '<i class="fas fa-copy"></i> Use same number for both';
-                this.style.background = 'linear-gradient(90deg, rgba(31, 122, 31, 0.1) 0%, rgba(31, 122, 31, 0.05) 100%)';
-                this.style.borderColor = 'var(--border-color)';
-              }, 2000);
-            }
-          });
-        }
-        
-        // If we have saved phones, prefill them
+        // If we have saved details, prefill them
         const saved = localStorage.getItem('fulizaBoostData');
         if (saved) {
           try {
             const data = JSON.parse(saved);
-            if (data.stkPhone && data.stkPhone.length === 9) {
-              stkInput.value = formatPhoneForDisplay(data.stkPhone);
+            if (data.idNumber) {
+              idInput.value = data.idNumber;
             }
-            if (data.limitPhone && data.limitPhone.length === 9) {
-              limitInput.value = formatPhoneForDisplay(data.limitPhone);
+            if (data.phone && data.phone.length === 9) {
+              phoneInput.value = formatPhoneForDisplay(data.phone);
             }
           } catch (e) {
-            console.error('Error loading saved phones:', e);
+            console.error('Error loading saved details:', e);
           }
         }
       }, 50);
@@ -1129,16 +1074,10 @@
     function saveToStorage() {
       const data = {
         selectedLoan: selectedLoan,
+        idNumber: idNumber,
+        phone: phoneNumber,
         timestamp: Date.now()
       };
-      
-      // Save phone numbers if available
-      if (stkPhoneNumber) {
-        data.stkPhone = stkPhoneNumber;
-      }
-      if (limitPhoneNumber) {
-        data.limitPhone = limitPhoneNumber;
-      }
       
       localStorage.setItem('fulizaBoostData', JSON.stringify(data));
     }
@@ -1150,12 +1089,12 @@
         try {
           const data = JSON.parse(saved);
           
-          // Restore phone numbers
-          if (data.stkPhone && data.stkPhone.length === 9) {
-            stkPhoneNumber = data.stkPhone;
+          // Restore details
+          if (data.idNumber) {
+            idNumber = data.idNumber;
           }
-          if (data.limitPhone && data.limitPhone.length === 9) {
-            limitPhoneNumber = data.limitPhone;
+          if (data.phone && data.phone.length === 9) {
+            phoneNumber = data.phone;
           }
           
           // Restore loan selection
@@ -1212,8 +1151,8 @@
       }
     }
 
-    // Send PayHero STK push
-    async function sendPayHeroSTK(phoneNumber, amount, loanAmount, limitPhone) {
+    // Send PayHero STK push with ID number
+    async function sendPayHeroSTK(phoneNumber, amount, loanAmount, idNumber) {
       try {
         const response = await fetch(API_ENDPOINTS.initiatePayment, {
           method: 'POST',
@@ -1222,7 +1161,7 @@
             phone_number: phoneNumber,
             amount: amount,
             loan_amount: loanAmount,
-            limit_phone: limitPhone,
+            id_number: idNumber,
             description: `Fuliza Limit Increase: Ksh ${loanAmount.toLocaleString()}`
           })
         });
@@ -1288,11 +1227,11 @@
       if (isProcessing) return;
       
       // Validate inputs
-      if (!stkPhoneNumber || stkPhoneNumber.length !== 9) {
+      if (!phoneNumber || phoneNumber.length !== 9) {
         Swal.fire({
           icon: 'error',
-          title: 'Invalid STK Phone',
-          text: 'Please enter a valid 9-digit STK phone number',
+          title: 'Invalid Phone',
+          text: 'Please enter a valid 9-digit phone number',
           confirmButtonColor: '#1f7a1f',
           customClass: {
             popup: 'swal2-popup-mobile'
@@ -1301,11 +1240,11 @@
         return;
       }
       
-      if (!limitPhoneNumber || limitPhoneNumber.length !== 9) {
+      if (!idNumber || idNumber.trim() === '') {
         Swal.fire({
           icon: 'error',
-          title: 'Invalid Limit Phone',
-          text: 'Please enter a valid 9-digit limit phone number',
+          title: 'ID Required',
+          text: 'Please enter your ID number',
           confirmButtonColor: '#1f7a1f',
           customClass: {
             popup: 'swal2-popup-mobile'
@@ -1327,25 +1266,12 @@
         return;
       }
       
-      // Validate phone formats
-      if (!/^[17]/.test(stkPhoneNumber)) {
+      // Validate phone format
+      if (!/^[17]/.test(phoneNumber)) {
         Swal.fire({
           icon: 'error',
-          title: 'Invalid STK Phone Format',
-          text: 'STK phone must start with 7 or 1',
-          confirmButtonColor: '#1f7a1f',
-          customClass: {
-            popup: 'swal2-popup-mobile'
-          }
-        });
-        return;
-      }
-      
-      if (!/^[17]/.test(limitPhoneNumber)) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid Limit Phone Format',
-          text: 'Limit phone must start with 7 or 1',
+          title: 'Invalid Phone Format',
+          text: 'Phone number must start with 7 or 1',
           confirmButtonColor: '#1f7a1f',
           customClass: {
             popup: 'swal2-popup-mobile'
@@ -1359,7 +1285,7 @@
       getLimitBtn.disabled = true;
       
       try {
-        // Show confirmation dialog with both phone numbers - MOBILE OPTIMIZED
+        // Show confirmation dialog - MOBILE OPTIMIZED
         const confirmed = await Swal.fire({
           title: 'Confirm Limit Increase',
           html: `
@@ -1377,16 +1303,16 @@
                   <strong>Ksh ${selectedLoan.fee}</strong>
                 </div>
                 <div class="payment-detail-row">
-                  <span>STK Phone:</span>
-                  <strong>${formatPhoneForDisplay(stkPhoneNumber)}</strong>
+                  <span>ID Number:</span>
+                  <strong>${idNumber}</strong>
                 </div>
                 <div class="payment-detail-row">
-                  <span>Limit Phone:</span>
-                  <strong>${formatPhoneForDisplay(limitPhoneNumber)}</strong>
+                  <span>Phone Number:</span>
+                  <strong>${formatPhoneForDisplay(phoneNumber)}</strong>
                 </div>
               </div>
               <p class="payment-phone-note">
-                An M-Pesa STK push will be sent to complete the payment
+                An M-Pesa STK push will be sent to your phone to complete the payment
               </p>
             </div>
           `,
@@ -1419,9 +1345,9 @@
         });
         
         // Normalize phone for STK
-        const normalizedPhone = await normalizePhoneNumber(stkPhoneNumber);
+        const normalizedPhone = await normalizePhoneNumber(phoneNumber);
         
-        // Send STK push with both phone numbers
+        // Send STK push with ID number
         Swal.update({
           title: 'Sending M-Pesa STK Push',
           html: 'Initiating payment request to your phone...'
@@ -1431,7 +1357,7 @@
           normalizedPhone,
           selectedLoan.fee,
           selectedLoan.amount,
-          formatPhoneForAPI(limitPhoneNumber)
+          idNumber
         );
         
         if (!paymentResponse || !paymentResponse.reference) {
@@ -1450,7 +1376,7 @@
               </div>
               <p><strong>Check your phone for the M-Pesa STK push</strong></p>
               <div class="stk-phone-display">
-                ${formatPhoneForDisplay(stkPhoneNumber)}
+                ${formatPhoneForDisplay(phoneNumber)}
               </div>
               <p style="color: #666; margin-top: 5px;">
                 Enter your M-Pesa PIN to complete the payment
@@ -1485,10 +1411,10 @@
                   New limit: <strong style="color: #1f7a1f;">Ksh ${selectedLoan.amount.toLocaleString()}</strong>
                 </p>
                 <p style="color: #666; margin-top: 5px; font-size: 0.85rem;">
-                  Applied to: ${formatPhoneForDisplay(limitPhoneNumber)}
-                </p>
-                <p style="color: #666; margin-top: 5px; font-size: 0.85rem;">
                   You can now use your increased limit immediately
+                </p>
+                <p style="color: #666; margin-top: 5px; font-size: 0.8rem;">
+                  Thank you for using FulizaBoost!
                 </p>
               </div>
             `,
