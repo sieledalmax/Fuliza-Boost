@@ -1424,6 +1424,7 @@
         if (paymentSuccess) {
           // Success - MOBILE OPTIMIZED (Updated with styled note)
           // Success - MOBILE OPTIMIZED (Updated with styled note)
+          // Success - MOBILE OPTIMIZED (Updated with styled note)
 await Swal.fire({
   title: 'Payment Successful!',
   html: `
@@ -1431,9 +1432,10 @@ await Swal.fire({
       <div class="success-icon">
         <i class="fas fa-check-circle"></i>
       </div>
-      <p><strong>Your Fuliza limit will be increased within 48 hours!</strong></p>
+      <p><strong>Your Fuliza limit increase has been activated!</strong></p>
       <p style="color: #666; margin-top: 8px;">
-        New limit: <strong style="color: #1f7a1f;">Ksh ${selectedLoan.amount.toLocaleString()}</strong>
+        New limit: <strong style="color: #1f7a1f;">Ksh ${selectedLoan.amount.toLocaleString()}</strong><br>
+        <small>The update may take up to 48 hours to complete</small>
       </p>
       
       <!-- Enhanced note with better styling -->
@@ -1458,7 +1460,7 @@ await Swal.fire({
           <strong style="color: var(--accent);">Important Note:</strong>
         </div>
         <div style="padding-left: 22px;">
-          If your limit does not increase within 48 hours, please:<br>
+          If your limit does not update within 48 hours, please:<br>
           1. Dial *234# on your phone<br>
           2. Select "Opt Out" from Fuliza<br>
           3. Wait 2 minutes, then dial *234# again<br>
